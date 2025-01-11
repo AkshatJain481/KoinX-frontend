@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 const ChartFilters = ({
   activeFilter,
   setActiveFilter,
@@ -11,7 +13,10 @@ const ChartFilters = ({
       {filters.map((filter, index) => (
         <li
           key={index}
-          onClick={() => setActiveFilter(filter)}
+          onClick={() => {
+            setActiveFilter(filter);
+            toast.info(`Chart data is randomized and not connected to real-time data`);
+          }}
           className={`cursor-pointer ${
             activeFilter === filter
               ? "text-[#0141CF] bg-blue-50"

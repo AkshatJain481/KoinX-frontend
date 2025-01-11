@@ -1,7 +1,7 @@
 import { RiArrowRightDoubleFill } from "react-icons/ri";
 import Image from "next/image";
 import { GoArrowRight } from "react-icons/go";
-import { TiArrowSortedUp } from "react-icons/ti";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import TimeSeriesChart from "../_components/Chart";
 import TabsComponent from "../_components/TabsComponent";
 import PriceRangeIndicator from "../_components/PriceRangeIndicator";
@@ -11,11 +11,21 @@ import SentimentCarousel from "../_components/SentimentCarousel";
 import { FaArrowRightLong } from "react-icons/fa6";
 import PieRingChart from "../_components/PieChart";
 import CurrencyCarousel from "../_components/CurrencyCarousel";
+import {
+  getCurrencyPrice,
+  getCoinDetails,
+  getTrendingCoins,
+} from "../_utils/apis";
 
-const page = ({ params }: { params: { currency: string } }) => {
-  const CryptoCurrency = params?.currency.replace(/^\w/, (c) =>
-    c.toUpperCase()
-  );
+const page = async ({ params }: { params: { currency: string } }) => {
+  const { currency } = await params; // Await the params object
+  const CryptoCurrency = currency.replace(/^\w/, (c) => c.toUpperCase());
+
+  const CurrencyData = await getCurrencyPrice({
+    ids: CryptoCurrency?.toLowerCase(),
+  });
+
+  const TrendingCurrencies = (await getTrendingCoins()) || [];
 
   const renderImage = () => {
     switch (CryptoCurrency) {
@@ -80,33 +90,44 @@ const page = ({ params }: { params: { currency: string } }) => {
           <span>{CryptoCurrency}</span>
         </p>
         <div className="lg:flex gap-8">
-          <div className="lg:w-2/3 xl:w-3/4 space-y-6">
-            <div className="bg-white p-6 rounded-lg">
-              {renderImage()}
-              <div className="flex items-center mt-10">
-                <p className="text-3xl max-sm:text-base font-semibold">
-                  $46,953.04
+          <div className="lg:w-2/3 xl:w-3/4">
+            <div className="sm:hidden">{renderImage()}</div>
+            <div className="bg-white p-2 sm:p-6 rounded-lg mb-6">
+              <div className="max-sm:hidden">{renderImage()}</div>
+              <div className="flex items-center sm:mt-10">
+                <p className="text-3xl font-semibold">
+                  $ {CurrencyData?.priceUSD}
                 </p>
-                <div className="text-[#14B079] flex items-center space-x-2 py-1 px-2 rounded-sm bg-green-50 ml-8">
-                  <TiArrowSortedUp color="#14B079" size={20} />
-                  <p>2.51%</p>
-                </div>
+                {CurrencyData?.change24hUSD >= 0 ? (
+                  <div className="text-[#14B079] flex items-center space-x-2 py-1 px-2 rounded-sm bg-green-50 ml-8">
+                    <TiArrowSortedUp color="#14B079" size={20} />
+                    <p>{CurrencyData?.change24hUSD?.toFixed(2)}</p>
+                  </div>
+                ) : (
+                  <div className="text-red-500 flex items-center space-x-2 py-1 px-2 rounded-sm bg-red-50 ml-8">
+                    <TiArrowSortedDown color="red" size={20} />
+                    <p>{CurrencyData?.change24hUSD?.toFixed(2)}</p>
+                  </div>
+                )}
                 <p className="text-gray-500 text-sm ml-4">(24H)</p>
               </div>
-              <p className="max-sm:text-xs text-lg mt-2 pb-4 border-b border-gray-200">
-                ₹ 39,42,343
+              <p className="text-lg mt-2 pb-4 border-b border-gray-200">
+                ₹ {CurrencyData?.priceINR}
               </p>
               <div>
-                <TimeSeriesChart CryptoCurrency={CryptoCurrency} />
+                <TimeSeriesChart
+                  BaseValue={CurrencyData?.priceUSD}
+                  CryptoCurrency={CryptoCurrency}
+                />
               </div>
             </div>
             <TabsComponent />
-            <div className="bg-white p-6 rounded-lg space-y-12">
+            <div className="bg-white p-6 rounded-lg space-y-12 mt-6">
               <h2 className="font-semibold text-2xl">Performance</h2>
               <PriceRangeIndicator />
               <Fundamentals Cryptocurrency={CryptoCurrency} />
             </div>
-            <div className="bg-white p-6 rounded-lg">
+            <div className="bg-white p-6 rounded-lg mt-6">
               <h2 className="font-semibold text-2xl">Sentiment</h2>
               <h3 className="flex space-x-2 items-center mt-6">
                 <span className="font-semibold text-xl text-[#44475B]">
@@ -153,7 +174,7 @@ const page = ({ params }: { params: { currency: string } }) => {
                 </ul>
               </div>
             </div>
-            <div className="bg-white p-6 rounded-lg">
+            <div className="bg-white p-6 rounded-lg mt-6">
               <h2 className="font-semibold text-2xl">About {CryptoCurrency}</h2>
               <p className="font-bold text-lg mt-8">
                 What is {CryptoCurrency}?
@@ -256,8 +277,7 @@ const page = ({ params }: { params: { currency: string } }) => {
                 tincidunt volutpat in eget. Ullamcorper dui
               </p>
             </div>
-
-            <div className="bg-white p-6 rounded-lg">
+            <div className="bg-white p-6 rounded-lg mt-6">
               <h2 className="font-semibold text-2xl">Tokenomics</h2>
               <h4 className="font-semibold text-xl mt-6">
                 Initial Distribution
@@ -275,7 +295,7 @@ const page = ({ params }: { params: { currency: string } }) => {
                 eget arcu ut. Vulputate ipsum aliquet odio nisi eu ac risus.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg">
+            <div className="bg-white p-6 rounded-lg mt-6">
               <h2 className="font-semibold text-2xl">Team</h2>
               <p className="mt-6 text-gray-800 font-medium">
                 Lorem ipsum dolor sit amet consectetur. Id consequat adipiscing
@@ -380,51 +400,47 @@ const page = ({ params }: { params: { currency: string } }) => {
             <div className="p-6 bg-white rounded-lg mt-8">
               <h2 className="text-2xl font-semibold">Trending Coins (24h)</h2>
               <ul className="mt-6 space-y-5">
-                <li className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Image
-                      src="/Bitcoin.svg"
-                      alt="Bitcoin"
-                      width={26}
-                      height={26}
-                    />
-                    <p>Ethereum(ETH)</p>
-                  </div>
-                  <div className="text-[#14B079] flex items-center space-x-2 py-1 px-2 rounded-sm bg-green-50 ml-8">
-                    <TiArrowSortedUp color="#14B079" size={20} />
-                    <p>2.51%</p>
-                  </div>
-                </li>
-                <li className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Image
-                      src="/Bitcoin.svg"
-                      alt="Bitcoin"
-                      width={26}
-                      height={26}
-                    />
-                    <p>Ethereum(ETH)</p>
-                  </div>
-                  <div className="text-[#14B079] flex items-center space-x-2 py-1 px-2 rounded-sm bg-green-50 ml-8">
-                    <TiArrowSortedUp color="#14B079" size={20} />
-                    <p>2.51%</p>
-                  </div>
-                </li>
-                <li className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Image
-                      src="/Bitcoin.svg"
-                      alt="Bitcoin"
-                      width={26}
-                      height={26}
-                    />
-                    <p>Ethereum(ETH)</p>
-                  </div>
-                  <div className="text-[#14B079] flex items-center space-x-2 py-1 px-2 rounded-sm bg-green-50 ml-8">
-                    <TiArrowSortedUp color="#14B079" size={20} />
-                    <p>2.51%</p>
-                  </div>
-                </li>
+                {TrendingCurrencies?.slice(0, 3)?.map(
+                  (coin: any, index: number) => (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Image
+                          src={coin?.item?.small}
+                          alt={coin?.item?.symbol}
+                          width={26}
+                          height={26}
+                          className="rounded-full"
+                        />
+                        <p>{coin?.item?.name}</p>
+                      </div>
+                      {coin?.item?.data?.price_change_percentage_24h?.usd >=
+                      0 ? (
+                        <div className="text-[#14B079] flex items-center space-x-2 py-1 px-2 rounded-sm bg-green-50 ml-8">
+                          <TiArrowSortedUp color="#14B079" size={20} />
+                          <p>
+                            {coin?.item?.data?.price_change_percentage_24h?.usd?.toFixed(
+                              2
+                            )}
+                            %
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-red-500 flex items-center space-x-2 py-1 px-2 rounded-sm bg-red-50 ml-8">
+                          <TiArrowSortedDown color="red" size={20} />
+                          <p>
+                            {coin?.item?.data?.price_change_percentage_24h?.usd?.toFixed(
+                              2
+                            )}
+                            %
+                          </p>
+                        </div>
+                      )}
+                    </li>
+                  )
+                )}
               </ul>
             </div>
           </div>
@@ -432,11 +448,11 @@ const page = ({ params }: { params: { currency: string } }) => {
       </div>
       <div className="bg-white my-24">
         <h2 className="font-semibold text-2xl px-12 mb-6">You May Also Like</h2>
-        <CurrencyCarousel />
+        <CurrencyCarousel TrendingCurrencies={TrendingCurrencies} />
         <h2 className="font-semibold text-2xl px-12 mt-10 mb-6">
           Trending Coins
         </h2>
-        <CurrencyCarousel />
+        <CurrencyCarousel TrendingCurrencies={TrendingCurrencies} />
       </div>
     </>
   );

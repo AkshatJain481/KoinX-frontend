@@ -2,12 +2,12 @@ import axios from "axios";
 
 const getCurrencyPrice = async ({
   ids,
-  vs_currencies,
-  include_24hr_change,
+  vs_currencies = "inr,usd",
+  include_24hr_change = true,
 }: {
   ids: string;
-  vs_currencies: string;
-  include_24hr_change: string;
+  vs_currencies?: string;
+  include_24hr_change?: boolean;
 }) => {
   try {
     const response = await axios.get(
@@ -21,16 +21,20 @@ const getCurrencyPrice = async ({
       }
     );
 
-    // Extract relevant data from the API response
-    const { currency } = response.data;
     return {
-      priceUSD: currency?.usd,
-      priceINR: currency?.inr,
-      change24h: currency?.usd_24h_change,
+      priceUSD: response.data[ids]?.usd,
+      priceINR: response.data[ids]?.inr,
+      change24hUSD: response.data[ids]?.usd_24h_change,
+      change24hINR: response.data[ids]?.inr_24h_change,
     };
-  } catch (error) {
-    console.error("Error fetching Bitcoin prices:", error);
-    throw new Error("Failed to fetch Bitcoin prices.");
+  } catch (error: any) {
+    console.warn("Error fetching Bitcoin prices:", error);
+    return {
+      priceUSD: 0,
+      priceINR: 0,
+      change24hUSD: 0,
+      change24hINR: 0,
+    };
   }
 };
 
@@ -40,18 +44,9 @@ const getTrendingCoins = async () => {
       "https://api.coingecko.com/api/v3/search/trending"
     );
 
-    // Extract the top 3 trending coins
-    const trendingCoins = response.data?.coins.slice(0, 3).map((coin: any) => ({
-      id: coin.item.id,
-      name: coin.item.name,
-      symbol: coin.item.symbol,
-      marketCapRank: coin.item.market_cap_rank,
-    }));
-
-    return trendingCoins;
-  } catch (error) {
+    return response.data?.coins;
+  } catch (error: any) {
     console.error("Error fetching trending coins:", error);
-    throw new Error("Failed to fetch trending coins.");
   }
 };
 
@@ -65,9 +60,8 @@ const getCoinDetails = async (coinId: string) => {
     return {
       symbol: response.data?.symbol,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error fetching details for coin ${coinId}:`, error);
-    throw new Error("Failed to fetch coin details.");
   }
 };
 

@@ -8,9 +8,10 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface TimeSeriesChartProps {
   CryptoCurrency: string;
+  BaseValue?: number;
 }
 
-const TimeSeriesChart = ({ CryptoCurrency }: TimeSeriesChartProps) => {
+const TimeSeriesChart = ({ CryptoCurrency , BaseValue }: TimeSeriesChartProps) => {
   const [filter, setFilter] = useState("1H");
   // Function to get time interval in milliseconds based on filter
   const getTimeInterval = (filter: string): number => {
@@ -64,7 +65,7 @@ const TimeSeriesChart = ({ CryptoCurrency }: TimeSeriesChartProps) => {
     timestamps: number[];
     dataPoints: number[];
   } => {
-    const baseValue = 42000;
+    const baseValue = BaseValue || 46000;
     const dataPoints: number[] = [];
     const timestamps: number[] = [];
     const interval = getTimeInterval(filter);
