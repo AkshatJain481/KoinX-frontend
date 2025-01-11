@@ -7,7 +7,7 @@ const ChartFilters = ({
 }) => {
   const filters = ["1H", "24H", "7D", "1M", "3M", "6M", "1Y", "ALL"];
   return (
-    <ul className="flex space-x-2 items-center">
+    <ul className="flex sm:space-x-2 items-center">
       {filters.map((filter, index) => (
         <li
           key={index}
@@ -16,7 +16,7 @@ const ChartFilters = ({
             activeFilter === filter
               ? "text-[#0141CF] bg-blue-50"
               : "text-gray-500"
-          } px-2 text-center rounded-full hover:bg-gray-100`}
+          } px-2 text-center max-sm:text-sm rounded-full hover:bg-gray-100`}
         >
           {filter}
         </li>

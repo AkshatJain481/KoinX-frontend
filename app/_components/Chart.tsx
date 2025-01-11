@@ -187,13 +187,13 @@ const TimeSeriesChart = ({ CryptoCurrency }: TimeSeriesChartProps) => {
 
   return (
     <>
-      <div className="flex items-center justify-between py-8">
+      <div className="max-md:space-y-4 md:flex items-center justify-between py-8">
         <p className="text-lg font-semibold">
           {CryptoCurrency} Price Chart (USD)
         </p>
         <ChartFilters setActiveFilter={setFilter} activeFilter={filter} />
       </div>
-      <Chart options={options} series={series} type="area" height={600} />
+      <Chart options={options} series={series} type="area" />
     </>
   );
 };

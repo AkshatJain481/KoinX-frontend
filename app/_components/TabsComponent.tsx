@@ -1,18 +1,17 @@
-import { useRef, useState, useEffect } from "react";
+"use client";
+import { useRef, useState, useLayoutEffect } from "react";
 
-const TabsComponent = ({
-  tabs,
-  activeTab,
-  setActiveTab,
-  className,
-  border = true,
-}: {
-  tabs: string[];
-  activeTab: number;
-  setActiveTab: (index: number) => void;
-  className?: string;
-  border?: boolean;
-}) => {
+const TabsComponent = () => {
+  const tabs = [
+    "Overview",
+    "Fundamentals",
+    "News Insights",
+    "Sentiments",
+    "Team",
+    "Technicals",
+    "Tokenomics",
+  ];
+  const [activeTab, setActiveTab] = useState(0);
   const ButtonRefs = useRef<(HTMLDivElement | null)[]>([]); // Store button refs
   const [borderStyle, setBorderStyle] = useState({
     width: 0,
@@ -30,32 +29,22 @@ const TabsComponent = ({
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     updateBorderStyle();
-
-    // Listen for resizing to update border position/width dynamically
-    const resizeObserver = new ResizeObserver(updateBorderStyle);
-    ButtonRefs.current.forEach(
-      (button) => button && resizeObserver.observe(button)
-    );
-
-    return () => resizeObserver.disconnect();
-  }, [activeTab, tabs]);
+  }, [activeTab]); // Only depend on activeTab
 
   return (
     <div
-      className={`flex relative ${
-        border && "border-y border-gray-300 border-solid"
-      }`}
+      className={`flex relative border-b border-gray-300 border-solid overflow-x-auto no-scrollbar`}
     >
       {tabs.map((tab: string, index: number) => (
         <div
           key={tab}
           onClick={() => setActiveTab(index)}
-          className={`${className} focus:outline-none cursor-pointer relative transition-colors duration-300 ease-in-out ${
+          className={`focus:outline-none cursor-pointer relative transition-colors duration-300 ease-in-out py-4 px-2 md:p-4 text-xs min-w-24 text-center md:text-sm lg:text-base ${
             activeTab === index
-              ? "text-[#0052FE]"
-              : "text-gray-600 hover:text-gray-700"
+              ? "text-[#0052FE] font-semibold"
+              : "text-gray-600 font-medium hover:text-gray-700"
           }`}
           ref={(el) => {
             ButtonRefs.current[index] = el;
@@ -65,7 +54,7 @@ const TabsComponent = ({
         </div>
       ))}
       <div
-        className="absolute bottom-0 h-0.5 bg-[#0052FE] transition-all duration-300"
+        className="absolute bottom-0 h-1 bg-[#0052FE] transition-all duration-300"
         style={{
           width: `${borderStyle.width}px`, // Match active tab width
           transform: borderStyle.transform, // Move to active tab position
