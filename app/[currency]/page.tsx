@@ -16,16 +16,20 @@ import {
   getCoinDetails,
   getTrendingCoins,
 } from "../_utils/apis";
+import { Coin, CoinsResponse } from "../_utils/interfaces";
 
-const page = async ({ params }: { params: { currency: string } }) => {
-  const { currency } = await params; // Await the params object
+const page = async ({ params }: { params: Promise<{ currency: string }> }) => {
+  const { currency } = await params;
   const CryptoCurrency = currency.replace(/^\w/, (c) => c.toUpperCase());
 
   const CurrencyData = await getCurrencyPrice({
     ids: CryptoCurrency?.toLowerCase(),
   });
 
-  const TrendingCurrencies = (await getTrendingCoins()) || [];
+  const TrendingCurrencies: CoinsResponse["coins"] =
+    (await getTrendingCoins()) || [];
+
+  const CurrencySymbol = await getCoinDetails(CryptoCurrency?.toLowerCase());
 
   const renderImage = () => {
     switch (CryptoCurrency) {
@@ -35,7 +39,9 @@ const page = async ({ params }: { params: { currency: string } }) => {
             <div className="flex items-center space-x-3">
               <Image src="/Bitcoin.svg" alt="Bitcoin" width={36} height={36} />
               <h1 className="text-2xl font-semibold">{CryptoCurrency}</h1>
-              <span className="font-semibold text-gray-500">BTC</span>
+              <span className="font-semibold text-gray-500">
+                {CurrencySymbol?.symbol?.toUpperCase()}
+              </span>
             </div>
             <div className="text-white bg-gray-500 p-2 rounded-lg">Rank #1</div>
           </div>
@@ -51,7 +57,9 @@ const page = async ({ params }: { params: { currency: string } }) => {
                 height={36}
               />
               <h1 className="text-2xl font-semibold">{CryptoCurrency}</h1>
-              <span className="font-semibold text-gray-500">ETH</span>
+              <span className="font-semibold text-gray-500">
+                {CurrencySymbol?.symbol?.toUpperCase()}
+              </span>
             </div>
             <div className="text-white bg-gray-500 p-2 rounded-lg">Rank #2</div>
           </div>
@@ -62,7 +70,9 @@ const page = async ({ params }: { params: { currency: string } }) => {
             <div className="flex items-center space-x-3">
               <Image src="/Polygon.svg" alt="Polygon" width={36} height={36} />
               <h1 className="text-2xl font-semibold">{CryptoCurrency}</h1>
-              <span className="font-semibold text-gray-500">MATIC</span>
+              <span className="font-semibold text-gray-500">
+                {CurrencySymbol?.symbol?.toUpperCase()}
+              </span>
             </div>
             <div className="text-white bg-gray-500 p-2 rounded-lg">Rank #3</div>
           </div>
@@ -73,7 +83,9 @@ const page = async ({ params }: { params: { currency: string } }) => {
             <div className="flex items-center space-x-3">
               <Image src="/Bitcoin.svg" alt="Bitcoin" width={36} height={36} />
               <h1 className="text-2xl font-semibold">{CryptoCurrency}</h1>
-              <span className="font-semibold text-gray-500">BTC</span>
+              <span className="font-semibold text-gray-500">
+                {CurrencySymbol?.symbol?.toUpperCase()}
+              </span>
             </div>
             <div className="text-white bg-gray-500 p-2 rounded-lg">Rank #1</div>
           </div>
@@ -401,7 +413,7 @@ const page = async ({ params }: { params: { currency: string } }) => {
               <h2 className="text-2xl font-semibold">Trending Coins (24h)</h2>
               <ul className="mt-6 space-y-5">
                 {TrendingCurrencies?.slice(0, 3)?.map(
-                  (coin: any, index: number) => (
+                  (coin: Coin, index: number) => (
                     <li
                       key={index}
                       className="flex items-center justify-between"

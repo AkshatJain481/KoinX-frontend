@@ -1,6 +1,7 @@
 import Image from "next/image";
+import { Coin } from "../_utils/interfaces";
 
-const CurrencyCards = ({ currency }: { currency: any }) => {
+const CurrencyCards = ({ currency }: { currency: Coin }) => {
   return (
     <div className="border border-gray-200 rounded-xl p-4 min-w-64 cursor-pointer">
       <h5 className="flex items-center space-x-3">

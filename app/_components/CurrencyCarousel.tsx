@@ -2,11 +2,12 @@
 import CurrencyCards from "./CurrencyCards";
 import { useRef } from "react";
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import { CoinsResponse, Coin } from "../_utils/interfaces";
 
 const CurrencyCarousel = ({
   TrendingCurrencies,
 }: {
-  TrendingCurrencies: any;
+  TrendingCurrencies: CoinsResponse["coins"];
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +43,7 @@ const CurrencyCarousel = ({
         ref={containerRef}
         className="overflow-y-auto flex gap-4 mt-4 no-scrollbar mx-12"
       >
-        {TrendingCurrencies?.map((currency: any, index: number) => (
+        {TrendingCurrencies?.map((currency: Coin, index: number) => (
           <CurrencyCards key={index} currency={currency} />
         ))}
       </div>

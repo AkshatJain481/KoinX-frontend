@@ -1,9 +1,11 @@
+import { JSX } from "react";
+
 const SentimentCards = ({
   icon,
   BgColor,
   BgColorIcon,
 }: {
-  icon: any;
+  icon: JSX.Element;
   BgColor: string;
   BgColorIcon: string;
 }) => {

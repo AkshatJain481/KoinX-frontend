@@ -27,7 +27,7 @@ const getCurrencyPrice = async ({
       change24hUSD: response.data[ids]?.usd_24h_change,
       change24hINR: response.data[ids]?.inr_24h_change,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.warn("Error fetching Bitcoin prices:", error);
     return {
       priceUSD: 0,
@@ -45,8 +45,8 @@ const getTrendingCoins = async () => {
     );
 
     return response.data?.coins;
-  } catch (error: any) {
-    console.error("Error fetching trending coins:", error);
+  } catch (error) {
+    console.warn("Error fetching trending coins:", error);
   }
 };
 
@@ -60,8 +60,8 @@ const getCoinDetails = async (coinId: string) => {
     return {
       symbol: response.data?.symbol,
     };
-  } catch (error: any) {
-    console.error(`Error fetching details for coin ${coinId}:`, error);
+  } catch (error) {
+    console.warn(`Error fetching details for coin ${coinId}:`, error);
   }
 };
 

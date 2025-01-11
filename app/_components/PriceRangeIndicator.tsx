@@ -33,7 +33,7 @@ const PriceRangeIndicator = ({
       {/* Today's Range */}
       <div className="flex items-center gap-2">
         <div className="text-gray-600 w-1/6 space-y-3">
-          <p className="text-xs sm:text-base">Today's Low</p>
+          <p className="text-xs sm:text-base">Today&apos;s Low</p>
           <p className="font-medium text-xs sm:text-lg">
             ${formatPrice(todayLow)}
           </p>
@@ -59,7 +59,7 @@ const PriceRangeIndicator = ({
           </div>
         </div>
         <div className="text-gray-600 w-1/6 space-y-3 text-right">
-          <p className="text-xs sm:text-base">Today's High</p>
+          <p className="text-xs sm:text-base">Today&apos;s High</p>
           <p className="font-medium text-xs sm:text-lg">
             ${formatPrice(todayHigh)}
           </p>
